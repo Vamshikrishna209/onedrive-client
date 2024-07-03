@@ -37,11 +37,11 @@ body {
   background-color: #0592ff;
 }
 
-.css-1q2h7u5 {
+.css-1q2h7u5, .css-1h9z7r5-MuiButtonBase-root-MuiTab-root {
   font-weight: 900 !important;
   font-size: 20 !important;
 }
 
-.css-1q2h7u5.Mui-selected {
+.css-1q2h7u5.Mui-selected, .css-1h9z7r5-MuiButtonBase-root-MuiTab-root.Mui-selected {
   color: white !important;
 }

@@ -37,6 +37,7 @@ function App() {
       const eventSource = new EventSource(`${baseURL}/events/sse`);
       eventSource.onmessage = (event) => {
         const data = JSON.parse(event.data);
+        console.log("event " + JSON.stringify(event));
         toast.info(`File change detected: ${data.message}`);
       };
       return () => {
@@ -87,6 +88,22 @@ function App() {
     }
   };
 
+  const createSubscription = async () => {
+    try {
+      const response = await axios.post(
+        `${baseURL}/realtime/subscribe`,
+        { fileId },
+        {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        }
+      );
+      toast.success(`Subscription created: ${response.data.id}`);
+    } catch (error) {
+      console.error('Error creating subscription:', error);
+      toast.error('Error creating subscription');
+    }
+  };
+
   const login = async () => {
     try {
       const response = await axios.get(`${baseURL}/auth/login`);
@@ -125,8 +142,8 @@ function App() {
           <AppBar position="static" style={{ marginTop: '20px' }}>
             <Tabs value={tabValue} onChange={handleTabChange}>
               <Tab label="List Files" />
-              {/* <Tab label="Download File" /> */}
               <Tab label="User Details" />
+              <Tab label="Subscribe to File" />
             </Tabs>
           </AppBar>
           <TabPanel value={tabValue} index={0}>
@@ -159,9 +176,7 @@ function App() {
                         >
                           Download
                         </Button>
-                          ) : <p>
-                            Empty file / folder
-                          </p>
+                          ): <p>Empty file / folder</p>
                         }
                         
                       </TableCell>
@@ -219,6 +234,19 @@ function App() {
                 </TableBody>
               </Table>
             </TableContainer>
+          </TabPanel>
+          <TabPanel value={tabValue} index={2}>
+            <TextField
+              label="File ID"
+              value={fileId}
+              onChange={handleFileIdChange}
+              variant="outlined"
+              fullWidth
+              margin="normal"
+            />
+            <Button variant="contained" color="primary" onClick={createSubscription}>
+              Subscribe to File
+            </Button>
           </TabPanel>
         </>
       )}
