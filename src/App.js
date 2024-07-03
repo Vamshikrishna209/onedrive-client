@@ -91,7 +91,7 @@ function App() {
   const createSubscription = async () => {
     try {
       const response = await axios.post(
-        `${baseURL}/realtime/subscribe`,
+        `${baseURL}/realtime/subscribe-file`,
         { fileId },
         {
           headers: { Authorization: `Bearer ${accessToken}` },
