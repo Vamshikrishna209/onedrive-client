@@ -97,7 +97,7 @@ function App() {
 
   const listUsers = async () => {
     try {
-      const response = await axios.get(`${baseURL}/onedrive/list-users?resource=${resource}`, {
+      const response = await axios.get(`${baseURL}/onedrive/list-users?fileId=${resource}`, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       setUsers(response.data.value.map(permission => permission.grantedTo.user));
@@ -207,7 +207,7 @@ function App() {
           </TabPanel> */}
           <TabPanel value={tabValue} index={1}>
             <TextField
-              label="Resource"
+              label="fileId"
               value={resource}
               onChange={handleResourceChange}
               variant="outlined"
