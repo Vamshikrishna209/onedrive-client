@@ -45,7 +45,13 @@ function App() {
             params: { resource },
             headers: { Authorization: `Bearer ${accessToken}` },
           });
-          const lastUpdatedFile = deltaResponse.data.value[0];
+          let sortedData = deltaResponse.data.value.sort((a, b) => {
+            const dateA = new Date(a.lastModifiedDateTime);
+            const dateB = new Date(b.lastModifiedDateTime);
+            return dateB - dateA;
+          });
+          const filteredData = sortedData.filter(item => item.name !== "root");
+          const lastUpdatedFile = filteredData[0];
           toast.info(`File updated: ${lastUpdatedFile.name}`);
         } catch (error) {
           console.error('Error fetching delta:', error);
