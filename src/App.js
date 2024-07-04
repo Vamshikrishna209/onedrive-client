@@ -23,9 +23,9 @@ import './App.css';
 
 function App() {
   const [files, setFiles] = useState([]);
-  const [fileId, setFileId] = useState('');
+  const [resource, setResource] = useState('');
   const [users, setUsers] = useState([]);
-  const [fileContent, setFileContent] = useState(null);
+  // const [fileContent, setFileContent] = useState(null);
   const [accessToken, setAccessToken] = useState(sessionStorage.getItem('accessToken') || '');
   const [tabValue, setTabValue] = useState(0);
 
@@ -35,10 +35,22 @@ function App() {
     if (accessToken) {
       sessionStorage.setItem('accessToken', accessToken);
       const eventSource = new EventSource(`${baseURL}/events/sse`);
-      eventSource.onmessage = (event) => {
+      eventSource.onmessage = async (event) => {
         const data = JSON.parse(event.data);
-        console.log("event " + JSON.stringify(event));
-        toast.info(`File change detected: ${data.message}`);
+        const resource = data.resource;
+
+        // Call the delta API
+        try {
+          const deltaResponse = await axios.get(`${baseURL}/onedrive/delta`, {
+            params: { resource },
+            headers: { Authorization: `Bearer ${accessToken}` },
+          });
+          const lastUpdatedFile = deltaResponse.data.value[0];
+          toast.info(`File updated: ${lastUpdatedFile.name}`);
+        } catch (error) {
+          console.error('Error fetching delta:', error);
+          toast.error('Error fetching delta');
+        }
       };
       return () => {
         eventSource.close();
@@ -46,7 +58,7 @@ function App() {
     }
   }, [accessToken, baseURL]);
 
-  const handleFileIdChange = (e) => setFileId(e.target.value);
+  const handleResourceChange = (e) => setResource(e.target.value);
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
@@ -63,44 +75,28 @@ function App() {
     }
   };
 
-  const downloadFile = async () => {
-    try {
-      const response = await axios.get(`${baseURL}/onedrive/download-file?fileId=${fileId}`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-        responseType: 'arraybuffer',
-      });
-      const blob = new Blob([response.data], { type: 'application/octet-stream' });
-      const url = URL.createObjectURL(blob);
-      setFileContent(url);
-    } catch (error) {
-      console.error('Error downloading file:', error);
-    }
-  };
+  // const downloadFile = async () => {
+  //   try {
+  //     const response = await axios.get(`${baseURL}/onedrive/download-file?resource=${resource}`, {
+  //       headers: { Authorization: `Bearer ${accessToken}` },
+  //       responseType: 'arraybuffer',
+  //     });
+  //     const blob = new Blob([response.data], { type: 'application/octet-stream' });
+  //     const url = URL.createObjectURL(blob);
+  //     setFileContent(url);
+  //   } catch (error) {
+  //     console.error('Error downloading file:', error);
+  //   }
+  // };
 
   const listUsers = async () => {
     try {
-      const response = await axios.get(`${baseURL}/onedrive/list-users?fileId=${fileId}`, {
+      const response = await axios.get(`${baseURL}/onedrive/list-users?resource=${resource}`, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       setUsers(response.data.value.map(permission => permission.grantedTo.user));
     } catch (error) {
       console.error('Error listing users:', error);
-    }
-  };
-
-  const createSubscription = async () => {
-    try {
-      const response = await axios.post(
-        `${baseURL}/realtime/subscribe-file`,
-        { fileId },
-        {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        }
-      );
-      toast.success(`Subscription created: ${response.data.id}`);
-    } catch (error) {
-      console.error('Error creating subscription:', error);
-      toast.error('Error creating subscription');
     }
   };
 
@@ -117,9 +113,9 @@ function App() {
     sessionStorage.removeItem('accessToken');
     setAccessToken('');
     setFiles([]);
-    setFileId('');
+    setResource('');
     setUsers([]);
-    setFileContent(null);
+    // setFileContent(null);
   };
 
   return (
@@ -143,7 +139,6 @@ function App() {
             <Tabs value={tabValue} onChange={handleTabChange}>
               <Tab label="List Files" />
               <Tab label="User Details" />
-              <Tab label="Subscribe to File" />
             </Tabs>
           </AppBar>
           <TabPanel value={tabValue} index={0}>
@@ -167,7 +162,7 @@ function App() {
                       <TableCell>
                         {
                           file.size > 0 ? (
-                            <Button
+                          <Button
                           variant="contained"
                           color="primary"
                           href={file['@microsoft.graph.downloadUrl']}
@@ -176,7 +171,7 @@ function App() {
                         >
                           Download
                         </Button>
-                          ): <p>Empty file / folder</p>
+                          ) : <p>Empty file/folder</p>
                         }
                         
                       </TableCell>
@@ -188,9 +183,9 @@ function App() {
           </TabPanel>
           {/* <TabPanel value={tabValue} index={1}>
             <TextField
-              label="File ID"
-              value={fileId}
-              onChange={handleFileIdChange}
+              label="Resource"
+              value={resource}
+              onChange={handleResourceChange}
               variant="outlined"
               fullWidth
               margin="normal"
@@ -206,9 +201,9 @@ function App() {
           </TabPanel> */}
           <TabPanel value={tabValue} index={1}>
             <TextField
-              label="File ID"
-              value={fileId}
-              onChange={handleFileIdChange}
+              label="Resource"
+              value={resource}
+              onChange={handleResourceChange}
               variant="outlined"
               fullWidth
               margin="normal"
@@ -234,19 +229,6 @@ function App() {
                 </TableBody>
               </Table>
             </TableContainer>
-          </TabPanel>
-          <TabPanel value={tabValue} index={2}>
-            <TextField
-              label="File ID"
-              value={fileId}
-              onChange={handleFileIdChange}
-              variant="outlined"
-              fullWidth
-              margin="normal"
-            />
-            <Button variant="contained" color="primary" onClick={createSubscription}>
-              Subscribe to File
-            </Button>
           </TabPanel>
         </>
       )}
