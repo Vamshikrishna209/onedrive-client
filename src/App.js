@@ -100,7 +100,13 @@ function App() {
       const response = await axios.get(`${baseURL}/onedrive/list-users?fileId=${resource}`, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
-      setUsers(response.data.value.map(permission => permission.grantedTo.user));
+      let userList = [];
+      response.data.value.foreach(permission => {
+        let user = permission.grantedTo.user || {};
+        user.email = permission?.invitation?.email || "NA";
+        userList.push(user)
+      })
+      setUsers(userList);
     } catch (error) {
       console.error('Error listing users:', error);
     }
@@ -223,6 +229,7 @@ function App() {
                   <TableRow>
                     <TableCell>User Name</TableCell>
                     <TableCell>User ID</TableCell>
+                    <TableCell>Email</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -230,6 +237,7 @@ function App() {
                     <TableRow key={user.id}>
                       <TableCell>{user.displayName}</TableCell>
                       <TableCell>{user.id}</TableCell>
+                      <TableCell>{user.email}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

@@ -1,70 +1,138 @@
-# Getting Started with Create React App
+# OneDrive Integration
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project integrates with OneDrive to provide functionalities such as listing files, downloading files, and listing users who have access to specific files. It also supports real-time updates using server-sent events (SSE).
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- **List Files**: List all files in a specified folder.
+- **Download File**: Download a specified file.
+- **List Users**: List users who have access to a specified file.
+- **Real-Time Updates**: Receive real-time updates when changes occur in specified resources.
 
-### `npm start`
+## Technologies Used
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- **Backend**: Nest.js, Axios, Event Emitter, Microsoft Graph API
+- **Frontend**: React.js, Material-UI, Axios, React-Toastify
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Prerequisites
 
-### `npm test`
+- Node.js
+- npm or yarn
+- A Microsoft Azure account to register your application and obtain API credentials.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Getting Started
 
-### `npm run build`
+### Testing the features in the deployed Website
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+1. **Login**: Navigate to `https://onedrive-client.onrender.com/` and click on the login button. You will be redirected to Microsoft's login page. After successful authentication, you will be redirected back to the application.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+2. **List Files**: Navigate to the "List Files" tab and click the "List Files" button to fetch and display files from OneDrive.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+3. **Download File**: Navigate to the "Download File" tab, enter the resource path, and click the "Download File" button to download the specified file.
 
-### `npm run eject`
+4. **List Users**: Navigate to the "User Details" tab, enter the resource path, and click the "List Users" button to list users who have access to the specified file.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+5. **Real-Time Updates**: The application will automatically display toast notifications for any changes detected in the specified resources.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### Local Setup
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## Backend Setup
 
-## Learn More
+1. **Clone the repository**:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+    ```bash
+    git clone https://github.com/your-repo/onedrive-integration.git
+    cd onedrive-integration/backend
+    ```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+2. **Install dependencies**:
 
-### Code Splitting
+    ```bash
+    npm install
+    ```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+3. **Set up environment variables**:
 
-### Analyzing the Bundle Size
+    Create a `.env` file in the `backend` directory with the following content:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+    ```env
+    CLIENT_ID=your_client_id
+    CLIENT_SECRET=your_client_secret
+    REDIRECT_URI=http://localhost:3000/auth/callback
+    TENANT_ID=your_tenant_id
+    ACCESS_TOKEN=your_access_token
+    ```
 
-### Making a Progressive Web App
+    Replace the placeholders with your actual Microsoft Azure application credentials.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+4. **Run the backend server**:
 
-### Advanced Configuration
+    ```bash
+    npm run start:dev
+    ```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+    The backend server will start on `http://localhost:3000`.
 
-### Deployment
+### Frontend Setup
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+1. **Navigate to the frontend directory**:
 
-### `npm run build` fails to minify
+    ```bash
+    cd ../frontend
+    ```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+2. **Install dependencies**:
+
+    ```bash
+    npm install
+    ```
+
+3. **Set up environment variables**:
+
+    Create a `.env` file in the `frontend` directory with the following content:
+
+    ```env
+    REACT_APP_BASE_URL=http://localhost:3000
+    ```
+
+4. **Run the frontend server**:
+
+    ```bash
+    npm start
+    ```
+
+    The frontend server will start on `http://localhost:3001`.
+
+## Usage
+
+1. **Login**: Navigate to `http://localhost:3001` and click on the login button. You will be redirected to Microsoft's login page. After successful authentication, you will be redirected back to the application.
+
+2. **List Files**: Navigate to the "List Files" tab and click the "List Files" button to fetch and display files from OneDrive.
+
+3. **Download File**: Navigate to the "Download File" tab, enter the resource path, and click the "Download File" button to download the specified file.
+
+4. **List Users**: Navigate to the "User Details" tab, enter the resource path, and click the "List Users" button to list users who have access to the specified file.
+
+5. **Real-Time Updates**: The application will automatically display toast notifications for any changes detected in the specified resources.
+
+## API Endpoints
+
+### Backend
+
+- **List Files**: `GET /onedrive/list-files`
+- **Download File**: `GET /onedrive/download-file?resource=RESOURCE_PATH`
+- **List Users**: `GET /onedrive/list-users?resource=RESOURCE_PATH`
+- **Delta API**: `GET /onedrive/delta?resource=RESOURCE_PATH`
+- **SSE Notifications**: `POST /realtime/notification`
+
+### Frontend
+
+- **List Files**: Calls the `GET /onedrive/list-files` endpoint.
+- **Download File**: Calls the `GET /onedrive/download-file` endpoint.
+- **List Users**: Calls the `GET /onedrive/list-users` endpoint.
+- **Delta API**: Calls the `GET /onedrive/delta` endpoint upon receiving SSE notifications.
+
+## License
+
+This project is licensed to vamshikrishna209@gmail.com
