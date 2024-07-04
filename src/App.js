@@ -100,11 +100,10 @@ function App() {
       const response = await axios.get(`${baseURL}/onedrive/list-users?fileId=${resource}`, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
-      let userList = [];
-      response.data.value.foreach(permission => {
+      let userList = response.data.value.map(permission => {
         let user = permission.grantedTo.user || {};
         user.email = permission?.invitation?.email || "NA";
-        userList.push(user)
+        return user;
       })
       setUsers(userList);
     } catch (error) {
